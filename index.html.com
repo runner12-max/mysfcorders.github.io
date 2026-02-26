@@ -16,11 +16,10 @@
             background-color: var(--brand-red);
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15 15l5 5m10-10l-5 5m20 20l5 5m10-10l-5 5M5 45l5 5m10-10l-5 5' stroke='%23ffffff22' stroke-width='2' fill='none'/%3E%3Ccircle cx='45' cy='15' r='2' fill='%23ffffff22'/%3E%3Ccircle cx='15' cy='45' r='2' fill='%23ffffff22'/%3E%3C/svg%3E");
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
         }
 
-        .custom-shadow {
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
+        .custom-shadow { box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
         .menu-tab.active {
             background-color: var(--brand-yellow);
@@ -37,9 +36,7 @@
             height: 180px;
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
         
         .tab-container {
             scrollbar-width: none;
@@ -52,9 +49,7 @@
         }
 
         @media (min-width: 440px) {
-            .tab-container {
-                justify-content: center;
-            }
+            .tab-container { justify-content: center; }
         }
 
         .service-option.active {
@@ -88,9 +83,7 @@
             line-height: 1;
         }
 
-        .qty-btn:active {
-            transform: scale(0.85);
-        }
+        .qty-btn:active { transform: scale(0.85); }
 
         #toast-container {
             position: fixed;
@@ -124,10 +117,25 @@
             100% { transform: translateY(-50px); opacity: 0; }
         }
 
-        .fade { animation: fadeAnim 0.8s ease-in-out; }
-        @keyframes fadeAnim {
-            from { opacity: 0.5; }
-            to { opacity: 1; }
+        /* Animasi Transisi Keranjang */
+        #cart-modal {
+            transition: visibility 0.3s;
+        }
+        #cart-modal.hidden {
+            visibility: hidden;
+            display: flex; /* Tetap flex tapi transparan/di luar layar */
+        }
+        #cart-content {
+            transition: transform 0.3s ease-in-out;
+        }
+        #cart-modal.hidden #cart-content {
+            transform: translateX(100%);
+        }
+        #cart-backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #cart-modal.hidden #cart-backdrop {
+            opacity: 0;
         }
     </style>
 </head>
@@ -145,99 +153,21 @@
                 </h1>
             </div>
             
-            <button onclick="toggleCart()" class="relative shrink-0 transition-transform active:scale-90 p-1">
-                <img src="https://i.ibb.co/DH93KktW/order-2.png" alt="order (2)" class="w-12 h-12 object-contain">
+            <button onclick="toggleCart(true)" class="relative shrink-0 transition-transform active:scale-90 p-1">
+                <img src="https://i.ibb.co/DH93KktW/order-2.png" alt="Keranjang" class="w-12 h-12 object-contain">
                 <span id="cart-count" class="absolute -top-1 -right-1 bg-white text-red-700 text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center border-2 border-red-700 shadow-sm">0</span>
             </button>
         </div>
 
-         <div id="promo-slider" class="slideshow-container custom-shadow border-4 border-[#ffcc00] relative overflow-hidden group">
-    
-    <div class="my-slide fade h-72 w-full bg-cover bg-center block" 
-         style="background-image: url('https://i.ibb.co/93m451S8/Desain-tanpa-judul-63.png');">
-    </div>
-    
-    <div class="my-slide fade h-72 w-full bg-cover bg-center hidden" 
-         style="background-image: url('https://i.ibb.co/05gPdHs/Desain-tanpa-judul-64.png');">
-    </div>
+        <div id="promo-slider" class="slideshow-container custom-shadow border-4 border-[#ffcc00] relative overflow-hidden group">
+            <div class="my-slide fade h-72 w-full bg-cover bg-center block" style="background-image: url('https://i.ibb.co.com/93m451S8/Desain-tanpa-judul-63.png');"></div>
+            <div class="my-slide fade h-72 w-full bg-cover bg-center hidden" style="background-image: url('https://i.ibb.co.com/05gPdHs/Desain-tanpa-judul-64.png');"></div>
+            <div class="my-slide fade h-72 w-full bg-cover bg-center hidden" style="background-image: url('https://i.ibb.co.com/Mk4KRxPj/GEPREK-BAKAR-2.png');"></div>
 
-    <div class="my-slide fade h-72 w-full bg-cover bg-center hidden" 
-         style="background-image: url('https://i.ibb.co/Mk4KRxPj/GEPREK-BAKAR-2.png');">
-    </div>
-
-    <button id="prevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10">
-        &#10094;
-    </button>
-    <button id="nextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10">
-        &#10095;
-    </button>
-</div>
-
-<style>
-    .fade { animation: fadeAnim 0.8s ease-in-out; }
-    @keyframes fadeAnim {
-        from { opacity: 0.5; }
-        to { opacity: 1; }
-    }
-</style>
-
-<script>
-(function() {
-    // Menggunakan scope lokal agar tidak bentrok dengan variabel global lainnya
-    const container = document.querySelector('#promo-slider');
-    const slides = container.querySelectorAll('.my-slide');
-    const btnPrev = container.querySelector('#prevBtn');
-    const btnNext = container.querySelector('#nextBtn');
-    
-    let currentIndex = 0;
-    let slideTimer;
-
-    function updateSlides(index) {
-        // Pastikan index tetap dalam range
-        if (index >= slides.length) currentIndex = 0;
-        else if (index < 0) currentIndex = slides.length - 1;
-        else currentIndex = index;
-
-        // Sembunyikan semua, tampilkan satu
-        slides.forEach((slide, i) => {
-            if (i === currentIndex) {
-                slide.classList.remove('hidden');
-                slide.style.display = 'block';
-            } else {
-                slide.classList.add('hidden');
-                slide.style.display = 'none';
-            }
-        });
-    }
-
-    function startTimer() {
-        stopTimer();
-        slideTimer = setInterval(() => {
-            updateSlides(currentIndex + 1);
-        }, 4000);
-    }
-
-    function stopTimer() {
-        clearInterval(slideTimer);
-    }
-
-    // Event Listeners
-    btnNext.addEventListener('click', () => {
-        updateSlides(currentIndex + 1);
-        startTimer();
-    });
-
-    btnPrev.addEventListener('click', () => {
-        updateSlides(currentIndex - 1);
-        startTimer();
-    });
-
-    // Jalankan pertama kali
-    updateSlides(currentIndex);
-    startTimer();
-})();
-</script>
- </header>
+            <button id="prevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10">&#10094;</button>
+            <button id="nextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10">&#10095;</button>
+        </div>
+    </header>
 
     <nav class="sticky top-0 z-10 bg-red-800 bg-opacity-95 border-b border-red-600 shadow-md">
         <div class="tab-container no-scrollbar max-w-md mx-auto">
@@ -250,6 +180,7 @@
 
     <main id="menu-container" class="max-w-md mx-auto px-4 py-4 grid grid-cols-1 gap-4"></main>
 
+    <!-- Modal Pilihan Bagian Ayam -->
     <div id="choice-modal" class="fixed inset-0 bg-black/80 z-[60] hidden flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl">
             <div class="bg-red-700 p-4 text-white">
@@ -263,34 +194,32 @@
         </div>
     </div>
 
-    <!-- Sidebar Keranjang dengan Fitur Catatan -->
-    <div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex justify-end">
-        <div class="bg-white w-full max-w-xs h-full p-6 flex flex-col shadow-2xl">
+    <!-- Sidebar Keranjang -->
+    <div id="cart-modal" class="fixed inset-0 z-50 hidden flex justify-end">
+        <!-- Backdrop (Area Luar) -->
+        <div id="cart-backdrop" onclick="toggleCart(false)" class="absolute inset-0 bg-black bg-opacity-60 opacity-100"></div>
+        
+        <!-- Konten Keranjang -->
+        <div id="cart-content" class="relative bg-white w-full max-w-xs h-full p-6 flex flex-col shadow-2xl translate-x-0">
             <div class="flex justify-between items-center mb-6 border-b-2 border-red-700 pb-3 shrink-0">
                 <h2 class="text-xl font-bold text-red-700 italic flex items-center gap-2">
                     <i class="fas fa-shopping-basket"></i> Keranjang
                 </h2>
-                <button onclick="toggleCart()" class="text-gray-400 hover:text-red-700 transition-colors">
+                <!-- Tombol Close -->
+                <button onclick="toggleCart(false)" class="text-gray-400 hover:text-red-700 transition-colors focus:outline-none">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
             
-            <!-- Daftar Item -->
             <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1"></div>
 
-            <!-- Bagian Form Keranjang -->
             <div class="border-t-2 border-gray-100 pt-4 shrink-0 overflow-y-auto max-h-[75%]">
-                <!-- Total Harga -->
                 <div class="flex justify-between font-bold text-xl mb-4 text-red-700">
                     <span>Total</span>
                     <span id="cart-total">Rp 0</span>
                 </div>
                 
                 <div class="space-y-4">
-                    <button onclick="toggleCart()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-all active:scale-95 text-xs uppercase tracking-wider">
-                        <i class="fas fa-arrow-left"></i> Kembali Belanja
-                    </button>
-
                     <!-- Pilihan Layanan -->
                     <div class="flex gap-1 p-1 bg-gray-100 rounded-lg overflow-x-auto no-scrollbar">
                         <button id="opt-dinein" onclick="setService('Makan di Tempat')" class="service-option flex-1 min-w-[80px] py-2 text-[10px] font-bold rounded-md border border-transparent transition-all active">Makan di Tempat</button>
@@ -298,10 +227,13 @@
                         <button id="opt-delivery" onclick="setService('Delivery Order')" class="service-option flex-1 min-w-[80px] py-2 text-[10px] font-bold rounded-md border border-transparent transition-all">Delivery</button>
                     </div>
 
-                    <!-- Input Identitas -->
-                    <input type="text" id="cust-name" placeholder="Nama Lengkap" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm">
+                    <!-- Input Identitas Pengirim -->
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-gray-500 px-1 uppercase">Nama Pemesan</label>
+                        <input type="text" id="cust-name" placeholder="Nama Anda" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm">
+                    </div>
                     
-                    <!-- Catatan Pesanan (Fitur Baru) -->
+                    <!-- Catatan Pesanan -->
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-gray-500 px-1 uppercase">Catatan Pesanan</label>
                         <textarea id="cust-note" placeholder="Contoh: Sambal dipisah, paha kanan, nasi dikit, dll." class="w-full p-3 border border-gray-300 rounded-lg h-16 focus:ring-2 focus:ring-red-500 outline-none text-sm resize-none"></textarea>
@@ -325,10 +257,15 @@
                             <button id="delivery-self" onclick="setReceiver('self')" class="delivery-tab flex-1 py-2 bg-gray-100 active">Diri Sendiri</button>
                             <button id="delivery-others" onclick="setReceiver('others')" class="delivery-tab flex-1 py-2 bg-gray-100">Orang Lain</button>
                         </div>
-                        <div id="others-phone-field" class="hidden">
-                            <input type="tel" id="cust-phone" placeholder="Nomor HP Penerima" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm">
+                        
+                        <!-- Input Nama Penerima -->
+                        <div id="others-info-fields" class="hidden space-y-2">
+                            <input type="text" id="cust-receiver-name" placeholder="Nama Penerima" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm">
+                            <input type="tel" id="cust-phone" placeholder="Nomor HP Penerima (WA)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm">
                         </div>
+
                         <textarea id="cust-address" placeholder="Alamat Pengiriman Lengkap" class="w-full p-3 border border-gray-300 rounded-lg h-20 focus:ring-2 focus:ring-red-500 outline-none text-sm"></textarea>
+                        
                         <div class="space-y-1">
                             <label class="text-[9px] font-bold text-gray-500 px-1 uppercase">Metode Pembayaran</label>
                             <div class="flex gap-2">
@@ -352,7 +289,7 @@
 
     <script>
         const menuData = [
-            { 
+               { 
                 id: 101, category: 'paket', name: 'Paket Ayam Geprek + Sosro', 
         basePrice: 17000, desc: 'Ayam geprek pedas nampol dipadu nasi hangat dan segarnya teh Sosro.', 
         img: 'https://i.ibb.co.com/LzrRSwt4/Desain-tanpa-judul-9.jpg', 
@@ -437,7 +374,23 @@
         let selectedReceiver = 'self';
         let selectedPayment = 'Bayar di Tempat (COD)';
 
-        window.onload = () => filterMenu('paket');
+        window.onload = () => {
+            filterMenu('paket');
+            initSlider();
+        };
+
+        function initSlider() {
+            const slides = document.querySelectorAll('.my-slide');
+            let current = 0;
+            const update = (n) => {
+                slides.forEach(s => s.classList.add('hidden'));
+                current = (n + slides.length) % slides.length;
+                slides[current].classList.remove('hidden');
+            };
+            document.getElementById('nextBtn').onclick = () => update(current + 1);
+            document.getElementById('prevBtn').onclick = () => update(current - 1);
+            setInterval(() => update(current + 1), 5000);
+        }
 
         function filterMenu(category) {
             document.querySelectorAll('.menu-tab').forEach(t => t.classList.toggle('active', t.innerText.toLowerCase() === category));
@@ -465,13 +418,27 @@
             });
         }
 
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<i class="fas fa-check-circle text-green-400"></i> ${message}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
+        // Fungsi Toggle Keranjang yang Diperbarui
+        function toggleCart(show) {
+            const modal = document.getElementById('cart-modal');
+            const content = document.getElementById('cart-content');
+            const backdrop = document.getElementById('cart-backdrop');
+            
+            if (show) {
+                modal.classList.remove('hidden');
+                // Beri jeda kecil agar transisi CSS berjalan
+                setTimeout(() => {
+                    content.classList.replace('translate-x-full', 'translate-x-0');
+                    backdrop.classList.replace('opacity-0', 'opacity-100');
+                }, 10);
+            } else {
+                content.classList.replace('translate-x-0', 'translate-x-full');
+                backdrop.classList.replace('opacity-100', 'opacity-0');
+                // Sembunyikan modal setelah animasi selesai (0.3s)
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
         }
 
         function handleAddToCart(id) {
@@ -512,6 +479,8 @@
             showToast(`${product.name} ditambahkan!`);
         }
 
+        function closeChoice() { document.getElementById('choice-modal').classList.add('hidden'); }
+
         function updateCartUI() {
             const count = cart.reduce((acc, i) => acc + i.quantity, 0);
             document.getElementById('cart-count').innerText = count;
@@ -532,9 +501,7 @@
                             <span class="text-xs font-black w-6 text-center text-gray-800">${item.quantity}</span>
                             <button onclick="changeQty(${itemId}, 1)" class="qty-btn bg-red-600 text-white shadow-sm">+</button>
                         </div>
-                        <button onclick="removeItem(${itemId})" class="shrink-0 transition-transform active:scale-75 ml-1">
-                            <img src="https://i.ibb.co/pBbKZcm3/order-4.png" alt="hapus" class="w-8 h-8 object-contain">
-                        </button>
+                        <button onclick="removeItem(${itemId})" class="text-red-500 p-1"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
             });
@@ -542,98 +509,101 @@
         }
 
         function changeQty(id, delta) {
-            const item = cart.find(i => i.id == id);
+            const item = cart.find(i => i.id === id);
             if(item) {
                 item.quantity += delta;
-                if(item.quantity <= 0) cart = cart.filter(i => i.id != id);
+                if(item.quantity <= 0) removeItem(id);
                 updateCartUI();
             }
         }
 
         function removeItem(id) {
-            cart = cart.filter(i => i.id != id);
+            cart = cart.filter(i => i.id !== id);
             updateCartUI();
         }
 
-        function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); }
-        function closeChoice() { document.getElementById('choice-modal').classList.add('hidden'); }
-
-        function setService(service) {
-            selectedService = service;
-            document.querySelectorAll('.service-option').forEach(btn => btn.classList.toggle('active', btn.innerText === (service === 'Delivery Order' ? 'Delivery' : service)));
-            document.getElementById('time-date-fields').classList.toggle('hidden', service === 'Delivery Order');
-            document.getElementById('delivery-fields').classList.toggle('hidden', service !== 'Delivery Order');
+        function setService(type) {
+            selectedService = type;
+            document.querySelectorAll('.service-option').forEach(btn => btn.classList.toggle('active', btn.innerText === type || (btn.id === 'opt-delivery' && type === 'Delivery Order')));
+            
+            document.getElementById('delivery-fields').classList.toggle('hidden', type !== 'Delivery Order');
+            document.getElementById('time-date-fields').classList.toggle('hidden', type === 'Delivery Order');
         }
 
         function setReceiver(type) {
             selectedReceiver = type;
             document.getElementById('delivery-self').classList.toggle('active', type === 'self');
             document.getElementById('delivery-others').classList.toggle('active', type === 'others');
-            document.getElementById('others-phone-field').classList.toggle('hidden', type === 'self');
+            document.getElementById('others-info-fields').classList.toggle('hidden', type === 'self');
         }
 
-        function setPayment(method) {
-            selectedPayment = method;
-            document.getElementById('pay-cod').classList.toggle('active', method.includes('COD'));
-            document.getElementById('pay-tf').classList.toggle('active', method.includes('Transfer'));
+        function setPayment(type) {
+            selectedPayment = type;
+            document.getElementById('pay-cod').classList.toggle('active', type === 'Bayar di Tempat (COD)');
+            document.getElementById('pay-tf').classList.toggle('active', type === 'Transfer Bank');
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-check-circle text-green-400"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2500);
         }
 
         function checkout() {
+            if(cart.length === 0) return alert('Keranjang masih kosong!');
+            
             const name = document.getElementById('cust-name').value;
-            const note = document.getElementById('cust-note').value;
-            if(!name || cart.length === 0) return alert('Mohon isi nama dan pilih menu!');
+            if(!name) return alert('Silahkan masukkan nama pemesan!');
 
-            let message = `🍗 *INVOICE SEDAYULAWAS FRIED CHICKEN* 🍗\n`;
-            message += `_Pesanan Online Melalui Website_\n`;
-            message += `==================================\n\n`;
-            message += `👤 *Data Pemesan:*\n`;
-            message += `• Nama: ${name}\n`;
-            message += `• Layanan: ${selectedService}\n`;
-            
-            // Tambahkan Catatan Pesanan ke dalam Invoice WhatsApp
-            if(note.trim() !== "") {
-                message += `• 📝 Catatan: ${note}\n`;
-            }
-            
+            let message = `*INVOICE PESANAN - SEDAYULAWAS FRIED CHICKEN*\n`;
+            message += `------------------------------------------\n`;
+            message += `*Pemesan:* ${name}\n`;
+            message += `*Layanan:* ${selectedService}\n`;
+
             if(selectedService === 'Delivery Order') {
+                if(selectedReceiver === 'others') {
+                    const rName = document.getElementById('cust-receiver-name').value;
+                    const rPhone = document.getElementById('cust-phone').value;
+                    if(!rName || !rPhone) return alert('Lengkapi data penerima!');
+                    message += `*Penerima:* ${rName} (${rPhone})\n`;
+                } else {
+                    message += `*Penerima:* Diri Sendiri\n`;
+                }
+                
                 const address = document.getElementById('cust-address').value;
-                const receiver = selectedReceiver === 'self' ? 'Diri Sendiri' : `Orang Lain (${document.getElementById('cust-phone').value})`;
-                message += `• Penerima: ${receiver}\n`;
-                message += `• Alamat: ${address}\n`;
-                message += `• Metode: ${selectedPayment}\n`;
+                if(!address) return alert('Alamat pengiriman harus diisi!');
+                message += `*Alamat:* ${address}\n`;
+                message += `*Pembayaran:* ${selectedPayment}\n`;
             } else {
-                const date = document.getElementById('cust-date').value || '-';
-                const time = document.getElementById('cust-time').value || '-';
-                message += `• Rencana: ${date} jam ${time}\n`;
+                const date = document.getElementById('cust-date').value;
+                const time = document.getElementById('cust-time').value;
+                if(!date || !time) return alert('Pilih tanggal dan jam pengambilan!');
+                message += `*Waktu:* ${date} | ${time}\n`;
             }
 
-            message += `\n🛒 *Rincian Pesanan:*\n`;
+            const note = document.getElementById('cust-note').value;
+            if(note) message += `*Catatan:* ${note}\n`;
+
+            message += `\n*DAFTAR PESANAN:*\n`;
             let total = 0;
-            cart.forEach(item => {
+            cart.forEach((item, index) => {
                 const subtotal = item.price * item.quantity;
-                message += `• ${item.quantity}x ${item.name}\n   └ Rp ${subtotal.toLocaleString('id-ID')}\n`;
                 total += subtotal;
+                message += `${index+1}. ${item.name} x${item.quantity}\n   _Rp ${subtotal.toLocaleString('id-ID')}_\n`;
             });
 
-            message += `\n==================================\n`;
-            message += `💰 *TOTAL BAYAR: Rp ${total.toLocaleString('id-ID')}*\n`;
-            message += `==================================\n\n`;
-            message += `🙏 *Terima kasih sudah memesan di Sedayulawas Fried Chicken!* Pesanan Anda akan segera kami proses. Mohon ditunggu ya! 😊✨`;
+            message += `------------------------------------------\n`;
+            message += `*TOTAL TAGIHAN: Rp ${total.toLocaleString('id-ID')}*\n`;
+            message += `------------------------------------------\n`;
+            message += `_Terima kasih telah memesan! Mohon tunggu konfirmasi dari admin kami._`;
 
-            const waUrl = `https://wa.me/62811520096?text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
+            const phone = "6281234567890"; // Ganti dengan nomor WhatsApp outlet Anda
+            const encoded = encodeURIComponent(message);
+            window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
         }
-
-        const slides = document.querySelectorAll('.my-slide');
-        let currentSlide = 0;
-        function showSlide(n) {
-            slides[currentSlide].classList.add('hidden');
-            currentSlide = (n + slides.length) % slides.length;
-            slides[currentSlide].classList.remove('hidden');
-        }
-        document.getElementById('nextBtn').onclick = () => showSlide(currentSlide + 1);
-        document.getElementById('prevBtn').onclick = () => showSlide(currentSlide - 1);
-        setInterval(() => showSlide(currentSlide + 1), 4000);
     </script>
 </body>
 </html>
