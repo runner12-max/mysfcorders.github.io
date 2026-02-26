@@ -600,7 +600,7 @@
             message += `------------------------------------------\n`;
             message += `_Terima kasih telah memesan! Mohon tunggu konfirmasi dari admin kami._`;
 
-            const phone = "6281234567890"; // Ganti dengan nomor WhatsApp outlet Anda
+            const phone = "62811520096"; // Ganti dengan nomor WhatsApp outlet Anda
             const encoded = encodeURIComponent(message);
             window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
         }
