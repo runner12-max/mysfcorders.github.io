@@ -117,25 +117,14 @@
             100% { transform: translateY(-50px); opacity: 0; }
         }
 
-        /* Animasi Transisi Keranjang */
         #cart-modal {
-            transition: visibility 0.3s;
-        }
-        #cart-modal.hidden {
-            visibility: hidden;
-            display: flex; /* Tetap flex tapi transparan/di luar layar */
-        }
-        #cart-content {
-            transition: transform 0.3s ease-in-out;
-        }
-        #cart-modal.hidden #cart-content {
-            transform: translateX(100%);
-        }
-        #cart-backdrop {
             transition: opacity 0.3s ease-in-out;
         }
-        #cart-modal.hidden #cart-backdrop {
-            opacity: 0;
+        #cart-content {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #cart-modal.hidden {
+            display: none;
         }
     </style>
 </head>
@@ -195,51 +184,43 @@
     </div>
 
     <!-- Sidebar Keranjang -->
-    <div id="cart-modal" class="fixed inset-0 z-50 hidden flex justify-end">
-        <!-- Backdrop (Area Luar) -->
-        <div id="cart-backdrop" onclick="toggleCart(false)" class="absolute inset-0 bg-black bg-opacity-60 opacity-100"></div>
-        
-        <!-- Konten Keranjang -->
-        <div id="cart-content" class="relative bg-white w-full max-w-xs h-full p-6 flex flex-col shadow-2xl translate-x-0">
+    <div id="cart-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm">
+        <div class="absolute inset-0" onclick="toggleCart(false)"></div>
+        <div id="cart-content" class="relative ml-auto bg-white w-full max-w-xs h-full p-6 flex flex-col shadow-2xl translate-x-full">
             <div class="flex justify-between items-center mb-6 border-b-2 border-red-700 pb-3 shrink-0">
                 <h2 class="text-xl font-bold text-red-700 italic flex items-center gap-2">
                     <i class="fas fa-shopping-basket"></i> Keranjang
                 </h2>
-                <!-- Tombol Close -->
-                <button onclick="toggleCart(false)" class="text-gray-400 hover:text-red-700 transition-colors focus:outline-none">
+                <button onclick="toggleCart(false)" class="text-gray-400 hover:text-red-700 transition-colors p-1">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
             
-            <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1"></div>
+            <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-1 scrollbar-thin"></div>
 
-            <div class="border-t-2 border-gray-100 pt-4 shrink-0 overflow-y-auto max-h-[75%]">
+            <div class="border-t-2 border-gray-100 pt-4 shrink-0 overflow-y-auto max-h-[70%]">
                 <div class="flex justify-between font-bold text-xl mb-4 text-red-700">
                     <span>Total</span>
                     <span id="cart-total">Rp 0</span>
                 </div>
                 
                 <div class="space-y-4">
-                    <!-- Pilihan Layanan -->
                     <div class="flex gap-1 p-1 bg-gray-100 rounded-lg overflow-x-auto no-scrollbar">
                         <button id="opt-dinein" onclick="setService('Makan di Tempat')" class="service-option flex-1 min-w-[80px] py-2 text-[10px] font-bold rounded-md border border-transparent transition-all active">Makan di Tempat</button>
                         <button id="opt-takeaway" onclick="setService('Take Away')" class="service-option flex-1 min-w-[80px] py-2 text-[10px] font-bold rounded-md border border-transparent transition-all">Take Away</button>
                         <button id="opt-delivery" onclick="setService('Delivery Order')" class="service-option flex-1 min-w-[80px] py-2 text-[10px] font-bold rounded-md border border-transparent transition-all">Delivery</button>
                     </div>
 
-                    <!-- Input Identitas Pengirim -->
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-gray-500 px-1 uppercase">Nama Pemesan</label>
                         <input type="text" id="cust-name" placeholder="Nama Anda" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm">
                     </div>
                     
-                    <!-- Catatan Pesanan -->
                     <div class="space-y-1">
                         <label class="text-[10px] font-bold text-gray-500 px-1 uppercase">Catatan Pesanan</label>
                         <textarea id="cust-note" placeholder="Contoh: Sambal dipisah, paha kanan, nasi dikit, dll." class="w-full p-3 border border-gray-300 rounded-lg h-16 focus:ring-2 focus:ring-red-500 outline-none text-sm resize-none"></textarea>
                     </div>
 
-                    <!-- Field Khusus Non-Delivery -->
                     <div id="time-date-fields" class="grid grid-cols-2 gap-2">
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] font-bold text-gray-500 px-1 uppercase">Pilih Tanggal</label>
@@ -251,14 +232,12 @@
                         </div>
                     </div>
 
-                    <!-- Field Khusus Delivery -->
                     <div id="delivery-fields" class="hidden space-y-3">
                         <div class="flex border rounded-lg overflow-hidden text-[10px] font-bold">
                             <button id="delivery-self" onclick="setReceiver('self')" class="delivery-tab flex-1 py-2 bg-gray-100 active">Diri Sendiri</button>
                             <button id="delivery-others" onclick="setReceiver('others')" class="delivery-tab flex-1 py-2 bg-gray-100">Orang Lain</button>
                         </div>
                         
-                        <!-- Input Nama Penerima -->
                         <div id="others-info-fields" class="hidden space-y-2">
                             <input type="text" id="cust-receiver-name" placeholder="Nama Penerima" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm">
                             <input type="tel" id="cust-phone" placeholder="Nomor HP Penerima (WA)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 outline-none text-sm">
@@ -418,26 +397,19 @@
             });
         }
 
-        // Fungsi Toggle Keranjang yang Diperbarui
         function toggleCart(show) {
             const modal = document.getElementById('cart-modal');
             const content = document.getElementById('cart-content');
-            const backdrop = document.getElementById('cart-backdrop');
-            
             if (show) {
                 modal.classList.remove('hidden');
-                // Beri jeda kecil agar transisi CSS berjalan
                 setTimeout(() => {
                     content.classList.replace('translate-x-full', 'translate-x-0');
-                    backdrop.classList.replace('opacity-0', 'opacity-100');
+                    modal.classList.add('opacity-100');
                 }, 10);
             } else {
                 content.classList.replace('translate-x-0', 'translate-x-full');
-                backdrop.classList.replace('opacity-100', 'opacity-0');
-                // Sembunyikan modal setelah animasi selesai (0.3s)
-                setTimeout(() => {
-                    modal.classList.add('hidden');
-                }, 300);
+                modal.classList.remove('opacity-100');
+                setTimeout(() => modal.classList.add('hidden'), 300);
             }
         }
 
@@ -501,7 +473,6 @@
                             <span class="text-xs font-black w-6 text-center text-gray-800">${item.quantity}</span>
                             <button onclick="changeQty(${itemId}, 1)" class="qty-btn bg-red-600 text-white shadow-sm">+</button>
                         </div>
-                        <button onclick="removeItem(${itemId})" class="text-red-500 p-1"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
             });
@@ -512,20 +483,14 @@
             const item = cart.find(i => i.id === id);
             if(item) {
                 item.quantity += delta;
-                if(item.quantity <= 0) removeItem(id);
+                if(item.quantity <= 0) cart = cart.filter(i => i.id !== id);
                 updateCartUI();
             }
-        }
-
-        function removeItem(id) {
-            cart = cart.filter(i => i.id !== id);
-            updateCartUI();
         }
 
         function setService(type) {
             selectedService = type;
             document.querySelectorAll('.service-option').forEach(btn => btn.classList.toggle('active', btn.innerText === type || (btn.id === 'opt-delivery' && type === 'Delivery Order')));
-            
             document.getElementById('delivery-fields').classList.toggle('hidden', type !== 'Delivery Order');
             document.getElementById('time-date-fields').classList.toggle('hidden', type === 'Delivery Order');
         }
@@ -554,55 +519,46 @@
 
         function checkout() {
             if(cart.length === 0) return alert('Keranjang masih kosong!');
-            
             const name = document.getElementById('cust-name').value;
             if(!name) return alert('Silahkan masukkan nama pemesan!');
 
-            let message = `*INVOICE PESANAN - SEDAYULAWAS FRIED CHICKEN*\n`;
-            message += `------------------------------------------\n`;
-            message += `*Pemesan:* ${name}\n`;
-            message += `*Layanan:* ${selectedService}\n`;
+            let msg = `🍗 *INVOICE SEDAYULAWAS FRIED CHICKEN* 🍗\n`;
+            msg += `Pesanan Online Melalui Website\n`;
+            msg += `=============================\n\n`;
+            msg += `👤 *Data Pemesan:*\n`;
+            msg += `* Nama: ${name}\n`;
+            msg += `* Layanan: ${selectedService}\n`;
+
+            const note = document.getElementById('cust-note').value;
+            if(note) msg += `* 📝 Catatan: ${note}\n`;
 
             if(selectedService === 'Delivery Order') {
-                if(selectedReceiver === 'others') {
-                    const rName = document.getElementById('cust-receiver-name').value;
-                    const rPhone = document.getElementById('cust-phone').value;
-                    if(!rName || !rPhone) return alert('Lengkapi data penerima!');
-                    message += `*Penerima:* ${rName} (${rPhone})\n`;
-                } else {
-                    message += `*Penerima:* Diri Sendiri\n`;
-                }
-                
+                const receiver = selectedReceiver === 'self' ? 'Diri Sendiri' : `${document.getElementById('cust-receiver-name').value} (${document.getElementById('cust-phone').value})`;
                 const address = document.getElementById('cust-address').value;
-                if(!address) return alert('Alamat pengiriman harus diisi!');
-                message += `*Alamat:* ${address}\n`;
-                message += `*Pembayaran:* ${selectedPayment}\n`;
+                if(!address) return alert('Lengkapi alamat pengiriman!');
+                msg += `* Penerima: ${receiver}\n`;
+                msg += `* Alamat: ${address}\n`;
+                msg += `* Metode: ${selectedPayment === 'Transfer Bank' ? 'Transfer Bank' : 'Bayar di Tempat (COD)'}\n`;
             } else {
                 const date = document.getElementById('cust-date').value;
                 const time = document.getElementById('cust-time').value;
-                if(!date || !time) return alert('Pilih tanggal dan jam pengambilan!');
-                message += `*Waktu:* ${date} | ${time}\n`;
+                msg += `* Waktu: ${date || '-'} | ${time || '-'}\n`;
             }
 
-            const note = document.getElementById('cust-note').value;
-            if(note) message += `*Catatan:* ${note}\n`;
-
-            message += `\n*DAFTAR PESANAN:*\n`;
+            msg += `\n🛒 *Rincian Pesanan:*\n`;
             let total = 0;
-            cart.forEach((item, index) => {
-                const subtotal = item.price * item.quantity;
-                total += subtotal;
-                message += `${index+1}. ${item.name} x${item.quantity}\n   _Rp ${subtotal.toLocaleString('id-ID')}_\n`;
+            cart.forEach(item => {
+                const sub = item.price * item.quantity;
+                total += sub;
+                msg += `* ${item.quantity}x ${item.name}\n  └ Rp ${sub.toLocaleString('id-ID')}\n`;
             });
 
-            message += `------------------------------------------\n`;
-            message += `*TOTAL TAGIHAN: Rp ${total.toLocaleString('id-ID')}*\n`;
-            message += `------------------------------------------\n`;
-            message += `_Terima kasih telah memesan! Mohon tunggu konfirmasi dari admin kami._`;
+            msg += `\n=============================\n`;
+            msg += `💰 *TOTAL BAYAR: Rp ${total.toLocaleString('id-ID')}*\n`;
+            msg += `=============================\n\n`;
+            msg += `🙏 Terima kasih sudah memesan di Sedayulawas Fried Chicken! Pesanan Anda akan segera kami proses. Mohon ditunggu ya! 😊✨`;
 
-            const phone = "62811520096"; // Ganti dengan nomor WhatsApp outlet Anda
-            const encoded = encodeURIComponent(message);
-            window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
+            window.open(`https://wa.me/62811520096?text=${encodeURIComponent(msg)}`, '_blank');
         }
     </script>
 </body>
